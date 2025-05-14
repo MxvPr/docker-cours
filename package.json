@@ -1,0 +1,17 @@
+{
+  "name": "forum-anonyme",
+  "version": "1.0.0",
+  "description": "Forum anonyme avec Docker et CI/CD",
+  "scripts": {
+    "commit": "cz"
+  },
+  "devDependencies": {
+    "commitizen": "^4.2.4",
+    "cz-conventional-changelog": "^3.3.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
