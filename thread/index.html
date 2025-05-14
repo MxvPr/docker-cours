@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum Anonyme - Messages</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .message {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+        }
+        .pseudo {
+            font-weight: bold;
+            color: #2c5282;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 0.8em;
+            text-align: right;
+        }
+        .content {
+            margin-top: 10px;
+        }
+        .refresh-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            text-align: center;
+            display: block;
+            margin: 20px auto;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .write-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Forum Anonyme - Messages</h1>
+    <button class="refresh-btn" onclick="fetchMessages()">Rafraîchir</button>
+    
+    <div id="messages-container"></div>
+    
+    <a class="write-link" href="http://localhost:8080">Écrire un nouveau message</a>
+    
+    <script>
+        // Fonction pour formater la date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return new Intl.DateTimeFormat('fr-FR', {
+                dateStyle: 'medium',
+                timeStyle: 'short'
+            }).format(date);
+        }
+        
+        // Fonction pour récupérer et afficher les messages
+        function fetchMessages() {
+            fetch('/api/messages')  // Utilisez un chemin relatif qui sera géré par Nginx
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erreur réseau');
+                    }
+                    return response.json();
+                })
+                .then(messages => {
+                    const container = document.getElementById('messages-container');
+                    container.innerHTML = '';
+                    
+                    if (messages.length === 0) {
+                        container.innerHTML = '<p>Aucun message pour le moment.</p>';
+                        return;
+                    }
+                    
+                    messages.forEach(message => {
+                        const messageElement = document.createElement('div');
+                        messageElement.className = 'message';
+                        
+                        messageElement.innerHTML = `
+                            <div class="pseudo">${message.pseudo}</div>
+                            <div class="timestamp">${formatDate(message.timestamp)}</div>
+                            <div class="content">${message.content}</div>
+                        `;
+                        
+                        container.appendChild(messageElement);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la récupération des messages:', error);
+                    document.getElementById('messages-container').innerHTML = 
+                        '<p>Impossible de charger les messages. Veuillez réessayer plus tard.</p>';
+                });
+        }
+        
+        // Charger les messages au chargement de la page
+        document.addEventListener('DOMContentLoaded', fetchMessages);
+    </script>
+</body>
+</html>
