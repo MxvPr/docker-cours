@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  api:
+    build: ./docker-cours/node-service
+    container_name: forum-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./docker-cours/node-service:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=db
+      - DB_PORT=27017
+      - DB_NAME=forum
+    networks:
+      - internal-network
+      - external-network
+    depends_on:
+      - db
+
+  db:
+    image: mongo:latest
+    container_name: forum-db
+    restart: unless-stopped
+    volumes:
+      - db-data:/data/db
+    networks:
+      - internal-network
+
+  thread:
+    image: nginx:alpine
+    container_name: forum-thread
+    restart: unless-stopped
+    volumes:
+      - ./thread:/usr/share/nginx/html
+      - ./thread/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    networks:
+      - internal-network
+      - external-network
+    depends_on:
+      - api
+
+  sender:
+    image: nginx:alpine
+    container_name: forum-sender
+    restart: unless-stopped
+    volumes:
+      - ./sender:/usr/share/nginx/html
+      - ./sender/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "8080:80"
+    networks:
+      - internal-network
+      - external-network
+    depends_on:
+      - api
+
+networks:
+  internal-network:
+    driver: bridge
+    internal: false
+  external-network:
+    driver: bridge
+
+volumes:
+  db-data:
