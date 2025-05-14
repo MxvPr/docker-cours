@@ -28,12 +28,23 @@ Le projet est composé de quatre services:
    cd forum-anonyme
    ```
 
-2. Lancez l'application:
+2. Vérifiez que tous les fichiers nécessaires sont présents:
+   ```bash
+   ls -la node-service/
+   ```
+   Assurez-vous que les fichiers index.js et package.json existent.
+
+3. Lancez l'application:
    ```bash
    docker-compose up -d
    ```
 
-3. Accédez aux interfaces:
+4. Si vous rencontrez des erreurs, vérifiez les logs:
+   ```bash
+   docker-compose logs -f forum-api
+   ```
+
+5. Accédez aux interfaces:
    - Lecture des messages: http://localhost
    - Écriture de messages: http://localhost:8080
 
@@ -53,17 +64,6 @@ Le projet est composé de quatre services:
 ├── thread/                    # Service d'affichage des messages
 │   ├── index.html             # Interface utilisateur
 │   └── nginx.conf             # Configuration Nginx
-└── sender/                    # Service d'écriture de messages
-    ├── index.html             # Interface utilisateur
-    └── nginx.conf             # Configuration Nginx
-```
-
-### Utilisation de Commitizen
-
-Ce projet utilise [Commitizen](https://github.com/commitizen/cz-cli) pour standardiser les messages de commit selon la convention [Conventional Commits](https://www.conventionalcommits.org/).
-
-1. Installez les dépendances:
-   ```bash
    npm install
    ```
 
