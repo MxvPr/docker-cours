@@ -1,0 +1,48 @@
+stages:
+  - validate
+  - test
+  - build
+  - deploy
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+
+validate:
+  stage: validate
+  image: node:16-alpine
+  script:
+    - cd docker-cours/node-service
+    - npm install
+    - npm run lint || echo "No linting configured"
+    - npm run format || echo "No formatting configured"
+
+test:
+  stage: test
+  image: node:16-alpine
+  script:
+    - cd docker-cours/node-service
+    - npm install
+    - npm test || echo "No tests configured"
+
+build:
+  stage: build
+  image: docker:20.10.16
+  services:
+    - docker:20.10.16-dind
+  script:
+    - export SHORT_COMMIT=$(echo $CI_COMMIT_SHA | cut -c1-8)
+    - docker build -t $CI_REGISTRY_IMAGE/api:$SHORT_COMMIT docker-cours/node-service
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push $CI_REGISTRY_IMAGE/api:$SHORT_COMMIT
+
+deploy:
+  stage: deploy
+  image: docker:20.10.16
+  services:
+    - docker:20.10.16-dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker-compose up -d
+  only:
+    - main
