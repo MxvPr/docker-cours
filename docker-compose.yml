@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   api:
-    build: ./docker-cours/node-service
+    build: ./node-service
     container_name: forum-api
     restart: unless-stopped
     ports:
@@ -31,7 +31,7 @@ services:
       - internal-network
 
   thread:
-    image: nginx:alpine
+    build: ./thread
     container_name: forum-thread
     restart: unless-stopped
     volumes:
@@ -46,7 +46,7 @@ services:
       - api
 
   sender:
-    image: nginx:alpine
+    build: ./sender
     container_name: forum-sender
     restart: unless-stopped
     volumes:
